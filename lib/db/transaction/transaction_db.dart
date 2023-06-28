@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
 
@@ -16,10 +17,22 @@ class TransactionDB implements TransactionDbFunctions {
   factory TransactionDB() {
     return instance;
   }
+
+  ValueNotifier<List<TransactionModel>> transactionListNotifier =
+      ValueNotifier([]);
+
   @override
   Future<void> addTransaction(TransactionModel obj) async {
     final _db = await Hive.openBox<TransactionModel>(TRANSACTION_DB_NAME);
     await _db.put(obj.id, obj);
+  }
+
+  Future<void> refresh() async {
+    final _list = await getAllTransactions();
+    _list.sort((a, b) => b.date.compareTo(a.date)); //
+    transactionListNotifier.value.clear();
+    transactionListNotifier.value.addAll(_list);
+    transactionListNotifier.notifyListeners();
   }
 
   @override

@@ -199,5 +199,7 @@ class _ScreenaddTransactionState extends State<ScreenaddTransaction> {
     );
 
     await TransactionDB.instance.addTransaction(_model);
+    Navigator.of(context).pop();
+    TransactionDB.instance.refresh();
   }
 }
