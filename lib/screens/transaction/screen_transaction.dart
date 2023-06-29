@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/db/category/category_db.dart';
 import 'package:money_manager/db/transaction/transaction_db.dart';
@@ -20,21 +21,36 @@ class ScreenTransaction extends StatelessWidget {
           //values
           itemBuilder: (ctx, index) {
             final _value = newList[index];
-            return Card(
-              elevation: 0,
-              child: ListTile(
-                leading: CircleAvatar(
-                  radius: 50,
-                  child: Text(
-                    parseDate(_value.date),
-                    textAlign: TextAlign.center,
+            return Slidable(
+              key: Key(_value.id!),
+              startActionPane: ActionPane(
+                motion: ScrollMotion(),
+                children: [
+                  SlidableAction(
+                    onPressed: (ctx) {
+                      TransactionDB.instance.deleteTransaction(_value.id!);
+                    },
+                    icon: Icons.delete,
+                    label: 'Delete',
+                  )
+                ],
+              ),
+              child: Card(
+                elevation: 0,
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 50,
+                    child: Text(
+                      parseDate(_value.date),
+                      textAlign: TextAlign.center,
+                    ),
+                    backgroundColor: _value.type == CategoryType.income
+                        ? Colors.green
+                        : Colors.red,
                   ),
-                  backgroundColor: _value.type == CategoryType.income
-                      ? Colors.green
-                      : Colors.red,
+                  title: Text('Rs.${_value.amount}'),
+                  subtitle: Text(_value.category.name),
                 ),
-                title: Text('Rs.${_value.amount}'),
-                subtitle: Text(_value.category.name),
               ),
             );
           },
